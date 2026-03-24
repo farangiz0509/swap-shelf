@@ -1,6 +1,6 @@
 # shim imghdr for Python 3.13 where stdlib imghdr is removed, required by python-telegram-bot 13.x
 try:
-    import imghdr
+    import imghdr  # type: ignore
 except ModuleNotFoundError:
     import types, sys
 
