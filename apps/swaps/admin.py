@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import SwapRequest, Swap
+
+admin.site.register(SwapRequest)
+admin.site.register(Swap)
