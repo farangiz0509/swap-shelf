@@ -9,12 +9,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from ..bot.services.user_services import get_or_create_user
-from ..bot.bot import hendle_update
 from .serializers import LoginSerializer, VerifySerializer
 
 
 class TelegramWebhookView(APIView):
     def post(self, request: Request):
+        from ..bot.bot import hendle_update
+
         data = request.data
         hendle_update(data)
         return Response("ok")

@@ -1,3 +1,17 @@
+# shim imghdr for Python 3.13 where stdlib imghdr is removed, required by python-telegram-bot 13.x
+try:
+    import imghdr
+except ModuleNotFoundError:
+    import types, sys
+
+    imghdr = types.ModuleType("imghdr")
+
+    def what(filename, h=None):
+        return None
+
+    imghdr.what = what
+    sys.modules["imghdr"] = imghdr
+
 from telegram import Bot, Update
 from telegram.ext import CommandHandler, Dispatcher, Filters, MessageHandler
 from django.conf import settings
