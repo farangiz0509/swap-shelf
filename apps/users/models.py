@@ -52,5 +52,21 @@ class User(AbstractUser):
 
     objects = UserManager()
 
-    def __str__(self):
+    @property
+    def average_rating(self) -> float:
+        """
+        Calculates the average rating from all received reviews.
+        """
+        from django.db.models import Avg
+        avg_rating = self.received_reviews.aggregate(avg=Avg('rating'))['avg']
+        return round(avg_rating, 1) if avg_rating else 0.0
+
+    def update_rating(self) -> None:
+        """
+        Updates the stored rating based on average of received reviews.
+        """
+        self.rating = int(self.average_rating * 2)  # Scale to 0-10
+        self.save(update_fields=['rating'])
+
+    def __str__(self) -> str:
         return f"({self.telegram_id}) - {self.name}"

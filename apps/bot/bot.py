@@ -2,7 +2,8 @@
 try:
     import imghdr  # type: ignore
 except ModuleNotFoundError:
-    import types, sys
+    import types
+    import sys
 
     imghdr = types.ModuleType("imghdr")
 
@@ -12,26 +13,50 @@ except ModuleNotFoundError:
     imghdr.what = what
     sys.modules["imghdr"] = imghdr
 
-from telegram import Bot, Update
-from telegram.ext import CommandHandler, Dispatcher, Filters, MessageHandler
+import logging
+from typing import Dict, Any
+
 from django.conf import settings
+from telegram import Bot, Update
+from telegram.ext import (
+    CommandHandler,
+    Dispatcher,
+    Filters,
+    MessageHandler,
+)
 
-from apps.bot.handlers.messages import contact_save, get_OTP_code
+from .handlers.commands import help_command, login, start
+from .handlers.messages import contact_save, get_OTP_code
 
-from .handlers.commands import login, start
+# Configure logging
+logger = logging.getLogger(__name__)
 
-bot = Bot(settings.TOKEN)
+# Initialize bot and dispatcher
+bot = Bot(token=settings.BOT_TOKEN)
 dispatcher = Dispatcher(bot, None, workers=4, use_context=True)
 
+# Register handlers
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("login", login))
-dispatcher.add_handler(CommandHandler("help", help))
+dispatcher.add_handler(CommandHandler("help", help_command))
 dispatcher.add_handler(MessageHandler(Filters.contact, contact_save))
 dispatcher.add_handler(
-    MessageHandler(Filters.regex("^🔢 OTP kod olish$"), get_OTP_code)
+    MessageHandler(Filters.regex(r"^🔢 OTP kod olish$"), get_OTP_code)
 )
 
 
-def hendle_update(data: dict):
-    update = Update.de_json(data, bot)
-    dispatcher.process_update(update)
+def handle_update(data: Dict[str, Any]) -> None:
+    """
+    Processes incoming Telegram update from webhook.
+    
+    Args:
+        data: Raw update data from Telegram API
+    """
+    try:
+        update = Update.de_json(data, bot)
+        if update:
+            dispatcher.process_update(update)
+        else:
+            logger.warning("Received invalid update data")
+    except Exception as e:
+        logger.error(f"Error processing update: {e}")

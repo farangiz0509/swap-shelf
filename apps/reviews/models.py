@@ -13,5 +13,10 @@ class Review(models.Model):
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Review by {self.reviewer.phone} for {self.reviewed_user.phone} - {self.rating}/5"
+    def save(self, *args, **kwargs) -> None:
+        super().save(*args, **kwargs)
+        # Update the reviewed user's rating
+        self.reviewed_user.update_rating()
+
+    def __str__(self) -> str:
+        return f"Review by {self.reviewer.name} for {self.reviewed_user.name} - {self.rating}/5"

@@ -91,8 +91,23 @@ def start(update: Update, context: CallbackContext):
         return
 
 
-def help(update: Update, context: CallbackContext):
-    update.message.reply_text("Yordam uchun /help buyrug'ini bering.")
+def help_command(update: Update, context: CallbackContext) -> None:
+    """
+    Provides help information to the user.
+    """
+    help_text = """
+❓ *Yordam*
+
+Bu bot orqali siz SwapShelf platformasida quyidagi amallarni bajarishingiz mumkin:
+
+🔐 *Kirish*: /login buyrug'i bilan saytga kirish uchun OTP kod oling
+📚 *Kitoblar*: Kitoblaringizni boshqarish
+🔄 *Almashuvlar*: Swap request va almashuvlarni kuzatish
+🔔 *Bildirishnomalar*: Yangiliklardan xabar olish
+
+Qo'shimcha yordam uchun admin bilan bog'laning.
+    """
+    update.message.reply_text(help_text, parse_mode="Markdown")
 
 
 def login(update: Update, context: CallbackContext):
